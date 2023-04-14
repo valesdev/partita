@@ -1,0 +1,28 @@
+{
+  "name": "partita",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/partita.esm.js",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/valesdev/partita.git"
+  },
+  "author": "Yuan Chong <ychongsaytc@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/valesdev/partita/issues"
+  },
+  "homepage": "https://github.com/valesdev/partita#readme",
+  "keywords": [
+    "Vue"
+  ],
+  "peerDependencies": {
+    "vue": ">=3.0",
+    "vuex": ">=4.0"
+  },
+  "dependencies": {
+  }
+}
