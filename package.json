@@ -34,6 +34,19 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "format": "prettier --write src/"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/valesdev/partita.git"
+  },
+  "author": "Yuan Chong <ychongsaytc@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/valesdev/partita/issues"
+  },
+  "homepage": "https://github.com/valesdev/partita#readme",
+  "keywords": [
+    "Vue"
+  ],
   "peerDependencies": {
     "vue": "^3.0.0"
   },
