@@ -2,8 +2,6 @@ import { type App, type Ref, type VNode, ref } from 'vue'
 
 import LogUtils from '@/utils/log'
 
-import type { ViewCreateEvent, ViewDestroyEvent, ViewHideEvent, ViewShowEvent } from './events'
-
 import PtViewStack from './components/PtViewStack.vue'
 import PtView from './components/PtView.vue'
 
@@ -33,6 +31,32 @@ interface ViewInstance {
   emitOnDestroy: (event: ViewDestroyEvent) => void
   emitOnShow: (event: ViewShowEvent) => void
   emitOnHide: (event: ViewHideEvent) => void
+}
+
+class ViewCreateEvent extends CustomEvent<void> {
+  constructor() {
+    super('create')
+  }
+}
+
+class ViewDestroyEvent extends CustomEvent<void> {
+  constructor() {
+    super('destroy')
+  }
+
+  runDefault(): void { }
+}
+
+class ViewShowEvent extends CustomEvent<void> {
+  constructor() {
+    super('show')
+  }
+}
+
+class ViewHideEvent extends CustomEvent<void> {
+  constructor() {
+    super('hide')
+  }
 }
 
 class ViewModule {
@@ -257,5 +281,9 @@ export {
   type StackItem,
   type ViewInstances,
   type ViewInstance,
+  ViewCreateEvent,
+  ViewDestroyEvent,
+  ViewHideEvent,
+  ViewShowEvent,
   PtViewStack
 }

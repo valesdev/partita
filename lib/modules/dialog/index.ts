@@ -251,4 +251,10 @@ class DialogModule {
 
 export default DialogModule
 
-export { type DialogItem, type DialogItemButton, PtDialogHolder }
+export {
+  type DialogShowOptions,
+  type DialogItem,
+  type DialogItemButton,
+  type DialogItemComponent,
+  PtDialogHolder
+}

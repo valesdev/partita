@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { inject, onBeforeUnmount } from 'vue'
 import { viewStackFn as injectionKeyForViewStackFn } from '../injectionKeys'
-import { ViewCreateEvent, ViewDestroyEvent, ViewHideEvent, ViewShowEvent } from '../events'
+import { ViewCreateEvent, ViewDestroyEvent, ViewHideEvent, ViewShowEvent } from '@/modules/view'
 
 const props = defineProps<{
   id: string,

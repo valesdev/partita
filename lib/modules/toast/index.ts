@@ -90,4 +90,8 @@ class ToastModule {
 
 export default ToastModule
 
-export { type ToastItem, PtToastHolder }
+export {
+  type ToastShowOptions,
+  type ToastItem,
+  PtToastHolder
+}

@@ -65,4 +65,7 @@ class LoadingModule {
 
 export default LoadingModule
 
-export { PtLoadingHolder }
+export {
+  type LoadingItem,
+  PtLoadingHolder
+}

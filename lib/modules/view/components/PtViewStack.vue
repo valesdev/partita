@@ -23,8 +23,7 @@
 <script setup lang="ts">
 import { type ComponentPublicInstance, ref, provide, createVNode, getCurrentInstance } from 'vue'
 import RandomUtils from '@/utils/random'
-import { default as ViewModule, type ViewInstance, type ViewInstances, type StackItem } from '@/modules/view'
-import { ViewCreateEvent, ViewDestroyEvent, ViewHideEvent, ViewShowEvent } from '../events'
+import { default as ViewModule, type ViewInstance, type ViewInstances, type StackItem, ViewCreateEvent, ViewDestroyEvent, ViewHideEvent, ViewShowEvent } from '@/modules/view'
 import { viewStackFn as injectionKeyForViewStackFn } from '../injectionKeys'
 
 const app = getCurrentInstance()

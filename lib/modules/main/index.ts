@@ -118,4 +118,9 @@ class MainModule {
 
 export default MainModule
 
-export { type MainModuleOptions }
+export {
+  type MainModuleOptions,
+  type PartitaSpinnerOptions,
+  type PartitaPtrOptions,
+  type PartitaDialogOptions
+}

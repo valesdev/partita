@@ -9,6 +9,13 @@ export default MainModule
 
 export { ViewModule, DialogModule, ToastModule, LoadingModule, DbbModule }
 
+export * from '@/modules/main'
+export * from '@/modules/view'
+export * from '@/modules/dialog'
+export * from '@/modules/toast'
+export * from '@/modules/loading'
+export * from '@/modules/dbb'
+
 declare module 'vue' {
   export interface ComponentCustomProperties {
     /**
