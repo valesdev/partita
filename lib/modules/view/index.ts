@@ -169,10 +169,7 @@ class ViewModule {
      * 出栈数量
      */
     steps?: number
-  } = {
-    stack: undefined,
-    steps: undefined
-  }): void {
+  } = { stack: undefined, steps: undefined }): void {
     LogUtils.d('[pt-view] pop', 'stack:', stack, 'steps:', steps)
 
     stack = this._fallbackStack(stack)
@@ -224,9 +221,7 @@ class ViewModule {
      * 视图栈名称
      */
     stack?: string
-  } = {
-    stack: undefined
-  }): void {
+  } = { stack: undefined }): void {
     LogUtils.d('[pt-view] clear', 'stack:', stack)
 
     stack = this._fallbackStack(stack)
@@ -246,9 +241,7 @@ class ViewModule {
      * 视图栈名称
      */
     stack?: string
-  } = {
-    stack: undefined
-  }): number | null {
+  } = { stack: undefined }): number | null {
     stack = this._fallbackStack(stack)
 
     if (stack != undefined && stack in this.stacks.value) {

@@ -66,13 +66,21 @@ const push = ({
 
   if (view !== null) {
     if (items.value.length > 0) {
+      // 前视图 Key
       const key = items.value[items.value.length - 1].key
+
+      // 触发前视图 hide 事件
       views.value[key].emitOnHide(new ViewHideEvent)
     }
 
+    // 新视图入栈
     items.value.push(view)
+
     window.setTimeout(() => {
+      // 触发新视图 create 事件
       views.value[key].emitOnCreate(new ViewCreateEvent)
+
+      // 触发新视图 show 事件
       views.value[key].emitOnShow(new ViewShowEvent)
     }, 0)
   }
@@ -82,16 +90,18 @@ const pop = ({
   steps = 1
 }: {
   steps?: number
-} = {
-    steps: undefined
-  }): void => {
+} = { steps: undefined }): void => {
   if (items.value.length > steps) {
     let isRunDefault = true
 
     const runDefault = () => {
+      // 原视图出栈
       items.value.splice(items.value.length - steps)
 
+      // 前视图 Key
       const key = items.value[items.value.length - steps].key
+
+      // 触发前视图 show 事件
       views.value[key].emitOnShow(new ViewShowEvent)
     }
 
@@ -100,16 +110,23 @@ const pop = ({
       i >= items.value.length - steps;
       i--
     ) {
+      // 原视图 Key
       const key = items.value[i].key
+
+      // 触发原视图 hide 事件
       views.value[key].emitOnHide(new ViewHideEvent)
-      views.value[key].emitOnDestroy(
-        Object.assign(new ViewDestroyEvent, {
-          preventDefault() {
-            isRunDefault = false
-          },
-          runDefault
-        })
-      )
+
+      // 触发原视图 destroy 事件
+      const destroyEvent = new ViewDestroyEvent
+      destroyEvent.preventDefault = () => {
+        isRunDefault = false
+      }
+      destroyEvent.runDefault = () => {
+        setTimeout(() => {
+          runDefault()
+        }, 0)
+      }
+      views.value[key].emitOnDestroy(destroyEvent)
     }
 
     if (isRunDefault) {
@@ -133,28 +150,40 @@ const replace = ({
       let isRunDefault = true
 
       const runDefault = () => {
+        // 原视图出栈、新视图入栈
         items.value.splice(
           items.value.length - 1,
           1,
           view
         )
+
         window.setTimeout(() => {
+          // 触发新视图 create 事件
           views.value[key].emitOnCreate(new ViewCreateEvent)
+
+          // 触发新视图 show 事件
           views.value[key].emitOnShow(new ViewShowEvent)
         }, 0)
       }
 
       {
+        // 原视图 Key
         const key = items.value[items.value.length - 1].key
+
+        // 触发原视图 hide 事件
         views.value[key].emitOnHide(new ViewHideEvent)
-        views.value[key].emitOnDestroy(
-          Object.assign(new ViewDestroyEvent, {
-            preventDefault() {
-              isRunDefault = false
-            },
-            runDefault
-          })
-        )
+
+        // 触发原视图 destroy 事件
+        const destroyEvent = new ViewDestroyEvent
+        destroyEvent.preventDefault = () => {
+          isRunDefault = false
+        }
+        destroyEvent.runDefault = () => {
+          setTimeout(() => {
+            runDefault()
+          }, 0)
+        }
+        views.value[key].emitOnDestroy(destroyEvent)
       }
 
       if (isRunDefault) {
