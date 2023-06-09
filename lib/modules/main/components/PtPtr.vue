@@ -1,5 +1,5 @@
 <template>
-  <div class="PtPtrIndicator" :style="style">
+  <div class="PtPtr" :style="style">
     <template v-if="component !== undefined">
       <component :is="component" :state="state">
         <slot />
@@ -7,7 +7,7 @@
     </template>
 
     <template v-else>
-      <div class="PtPtrIndicator__wrap">
+      <div class="PtPtr__wrap">
         <slot />
       </div>
     </template>
@@ -15,25 +15,24 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-
-import MainModule from '@/modules/main'
+import { type Component, computed } from 'vue'
 
 const props = defineProps<{
   /**
+   * 下拉刷新自定义组件
+   */
+  component?: Component,
+
+  /**
    * 下拉刷新触发阈值
    */
-   threshold: number,
+  threshold: number,
 
   /**
    * 下拉刷新状态
    */
   state?: string
 }>()
-
-const component = computed(() => {
-  return MainModule.options.ptr?.component
-})
 
 const style = computed(() => {
   return {
@@ -43,7 +42,7 @@ const style = computed(() => {
 </script>
 
 <style lang="scss">
-.PtPtrIndicator {
+.PtPtr {
   &__wrap {}
 }
 </style>

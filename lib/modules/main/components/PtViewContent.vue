@@ -9,7 +9,13 @@
     @touchend="onTouchend"
   >
     <template v-if="enabledPtr">
-      <PtPtrIndicator :threshold="ptrThreshold" :state="ptrState" />
+      <slot name="ptr">
+        <PtPtr
+          :component="ptrComponent"
+          :threshold="ptrThreshold"
+          :state="ptrState"
+        />
+      </slot>
     </template>
 
     <slot />
@@ -17,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { type Component, ref, computed } from 'vue'
 
 import MainModule from '@/modules/main'
 
@@ -26,6 +32,16 @@ const props = defineProps<{
    * 下拉刷新被触发时的回调
    */
   pullToRefresh?: Function,
+
+  /**
+   * 下拉刷新自定义组件
+   */
+  ptrComponent?: Component,
+
+  /**
+   * 下拉刷新触发阈值
+   */
+  ptrThreshold?: number,
 
   /**
    * 无限滚动被触发时的回调
@@ -69,13 +85,17 @@ const enabledIs = computed<boolean>(() => {
 })
 
 /**
+ * 下拉刷新自定义组件
+ */
+const ptrComponent = computed(() => {
+  return props.ptrComponent ?? MainModule.options.ptr?.component
+})
+
+/**
  * 触发下拉刷新的滑动距离阈值
  */
 const ptrThreshold = computed<number>(() => {
-  if (MainModule.options.ptr !== undefined && MainModule.options.ptr.threshold !== undefined) {
-    return MainModule.options.ptr.threshold
-  }
-  return 0
+  return props.ptrThreshold ?? MainModule.options.ptr?.threshold ?? 0
 })
 
 const style = computed(() => {

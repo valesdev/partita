@@ -22,7 +22,7 @@ import PtSplitHeadbar from './components/PtSplitHeadbar.vue'
 import PtSplitFootbar from './components/PtSplitFootbar.vue'
 import PtModal from './components/PtModal.vue'
 import PtSpinner from './components/PtSpinner.vue'
-import PtPtrIndicator from './components/PtPtrIndicator.vue'
+import PtPtr from './components/PtPtr.vue'
 
 interface PartitaSpinnerOptions {
   /**
@@ -98,7 +98,7 @@ class MainModule {
     app.component('PtSplitFootbar', PtSplitFootbar)
     app.component('PtModal', PtModal)
     app.component('PtSpinner', PtSpinner)
-    app.component('PtPtrIndicator', PtPtrIndicator)
+    app.component('PtPtr', PtPtr)
 
     // options
     this._options = options
