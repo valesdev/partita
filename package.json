@@ -1,10 +1,38 @@
 {
   "name": "partita",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
-  "main": "dist/partita.esm.js",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/partita.umd.cjs",
+  "module": "./dist/partita.js",
+  "types": "./dist/partita.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/partita.d.ts",
+        "default": "./dist/partita.js"
+      },
+      "require": {
+        "types": "./dist/partita.d.ts",
+        "default": "./dist/partita.umd.cjs"
+      }
+    },
+    "./style": {
+      "import": "./dist/style.css",
+      "require": "./dist/style.css"
+    }
+  },
   "scripts": {
-    "build": "node build.js"
+    "dev": "vite",
+    "build": "run-p type-check build-only",
+    "preview": "vite preview",
+    "build-only": "vite build",
+    "type-check": "vue-tsc --noEmit -p tsconfig.app.json --composite false",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
+    "format": "prettier --write src/"
   },
   "repository": {
     "type": "git",
@@ -20,9 +48,24 @@
     "Vue"
   ],
   "peerDependencies": {
-    "vue": ">=3.0",
-    "vuex": ">=4.0"
+    "vue": "^3.0.0"
   },
-  "dependencies": {
+  "devDependencies": {
+    "@rushstack/eslint-patch": "^1.2.0",
+    "@tsconfig/node18": "^2.0.1",
+    "@types/node": "^18.16.16",
+    "@vitejs/plugin-vue": "^4.2.3",
+    "@vue/eslint-config-prettier": "^7.1.0",
+    "@vue/eslint-config-typescript": "^11.0.3",
+    "@vue/tsconfig": "^0.4.0",
+    "eslint": "^8.39.0",
+    "eslint-plugin-vue": "^9.11.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.8.8",
+    "sass": "^1.62.1",
+    "typescript": "~5.0.4",
+    "vite": "^4.3.5",
+    "vite-plugin-dts": "^2.3.0",
+    "vue-tsc": "^1.6.4"
   }
 }
