@@ -10,7 +10,7 @@
   >
     <template v-if="enabledPtr">
       <slot name="ptr">
-        <PtPtr
+        <PtPtrWrapper
           :component="ptrComponent"
           :threshold="ptrThreshold"
           :state="ptrState"

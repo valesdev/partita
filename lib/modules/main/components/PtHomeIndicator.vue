@@ -8,7 +8,6 @@
 <style lang="scss">
 .PtHomeIndicator {
   width: 100%;
-  background-color: #ffffff;
   height: env(safe-area-inset-bottom);
 }
 </style>

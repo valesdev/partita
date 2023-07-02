@@ -37,7 +37,7 @@ interface DialogItem {
   /**
    * 对话框自定义组件
    */
-  component?: DialogItemComponent
+  extraComponent?: DialogItemComponent
 
   /**
    * 对话框按钮
@@ -74,7 +74,7 @@ interface DialogShowOptions {
   /**
    * 对话框自定义组件
    */
-  component?: DialogItemComponent
+  extraComponent?: DialogItemComponent
 
   /**
    * 对话框按钮
@@ -97,13 +97,13 @@ interface DialogShowOptions {
 class DialogModule {
   private static items: Ref<DialogItem[]> = ref([])
 
-  static install(app: App) {
+  static install (app: App): void {
     LogUtils.d('[pt] plugin install - dialog')
 
     app.config.globalProperties.$dialog = this
   }
 
-  static get currentItems() {
+  static get currentItems () {
     return this.items.value
   }
 
@@ -112,7 +112,7 @@ class DialogModule {
    *
    * @returns 交互结果
    */
-  static show(
+  static show (
     /**
      * 对话框内容
      */
@@ -137,7 +137,7 @@ class DialogModule {
         key,
         title,
         content,
-        component: options?.component !== undefined && options?.component !== null ? markRaw(options.component) : undefined,
+        extraComponent: options?.extraComponent !== undefined ? markRaw(options.extraComponent) : undefined,
         buttons: options?.buttons,
         cancelable: options?.cancelable ?? false,
         callback: options?.callback,
@@ -151,7 +151,7 @@ class DialogModule {
   /**
    * 通过 Key 隐藏对话框
    */
-  static hideByKey(
+  static hideByKey (
     /**
      * 对话框 Key
      */
@@ -170,7 +170,7 @@ class DialogModule {
    *
    * @returns 交互结果
    */
-  static alert(
+  static alert (
     /**
      * 对话框内容
      */
@@ -198,7 +198,7 @@ class DialogModule {
    *
    * @returns 交互结果
    */
-  static confirm(
+  static confirm (
     /**
      * 对话框内容
      */
@@ -224,7 +224,7 @@ class DialogModule {
     })
   }
 
-  private static get defaultLabelForOk() {
+  private static get defaultLabelForOk () {
     return typeof MainModule.options.dialog?.defaultLabelForOk === 'function'
       ? MainModule.options.dialog?.defaultLabelForOk()
       : MainModule.options.dialog?.defaultLabelForOk !== undefined
@@ -232,7 +232,7 @@ class DialogModule {
         : 'OK'
   }
 
-  private static get defaultLabelForYes() {
+  private static get defaultLabelForYes () {
     return typeof MainModule.options.dialog?.defaultLabelForYes === 'function'
       ? MainModule.options.dialog?.defaultLabelForYes()
       : MainModule.options.dialog?.defaultLabelForYes !== undefined
@@ -240,7 +240,7 @@ class DialogModule {
         : 'Yes'
   }
 
-  private static get defaultLabelForNo() {
+  private static get defaultLabelForNo () {
     return typeof MainModule.options.dialog?.defaultLabelForNo === 'function'
       ? MainModule.options.dialog?.defaultLabelForNo()
       : MainModule.options.dialog?.defaultLabelForNo !== undefined

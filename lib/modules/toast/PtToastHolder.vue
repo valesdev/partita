@@ -7,7 +7,19 @@
       <div class="PtToastHolder__item" @click="onClickItem(item)">
         <div class="PtToastHolder__item-bg" />
 
-        <div class="PtToastHolder__item-fg">{{ item.content }}</div>
+        <div class="PtToastHolder__item-fg">
+          <template v-if="item.component !== undefined">
+            <component :is="item.component">
+              <template v-if="item.content !== null">{{ item.content }}</template>
+            </component>
+          </template>
+
+          <template v-else>
+            <div class="PtToastHolder__item-content">
+              <template v-if="item.content !== null">{{ item.content }}</template>
+            </div>
+          </template>
+        </div>
       </div>
     </template>
   </TransitionGroup>
@@ -54,6 +66,9 @@ const onClickItem = (
   &__item-fg {
     position: relative;
     z-index: 1;
+  }
+
+  &__item-content {
   }
 }
 </style>

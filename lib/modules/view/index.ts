@@ -44,7 +44,7 @@ class ViewDestroyEvent extends CustomEvent<void> {
     super('destroy')
   }
 
-  runDefault(): void { }
+  runDefault (): void { }
 }
 
 class ViewShowEvent extends CustomEvent<void> {
@@ -64,7 +64,7 @@ class ViewModule {
 
   private static visibles: Ref<string[]> = ref([])
 
-  static install(app: App) {
+  static install (app: App): void {
     LogUtils.d('[pt] plugin install – view')
 
     app.config.globalProperties.$view = this
@@ -74,11 +74,11 @@ class ViewModule {
     app.component('PtView', PtView)
   }
 
-  static get currentVisibles() {
+  static get currentVisibles () {
     return this.visibles.value
   }
 
-  static registerStack(
+  static registerStack (
     name: string,
     instance: StackInstance
   ): void {
@@ -89,10 +89,20 @@ class ViewModule {
     this.stacks.value[name] = instance
   }
 
+  static unregisterStack (
+    name: string
+  ): void {
+    LogUtils.d('[pt-view] unregisterStack')
+
+    if (!(name in this.stacks.value)) return
+
+    delete this.stacks.value[name]
+  }
+
   /**
    * 显示视图栈
    */
-  static show(
+  static show (
     /**
      * 视图栈名称
      */
@@ -108,7 +118,7 @@ class ViewModule {
   /**
    * 隐藏视图栈
    */
-  static hide(
+  static hide (
     /**
      * 视图栈名称
      */
@@ -124,7 +134,7 @@ class ViewModule {
   /**
    * 视图栈视图入栈
    */
-  static push({
+  static push ({
     stack,
     name,
     params
@@ -156,7 +166,7 @@ class ViewModule {
   /**
    * 视图栈视图出栈
    */
-  static pop({
+  static pop ({
     stack,
     steps = 1
   }: {
@@ -182,7 +192,7 @@ class ViewModule {
   /**
    * 替换视图栈栈尾视图
    */
-  static replace({
+  static replace ({
     stack,
     name,
     params
@@ -214,7 +224,7 @@ class ViewModule {
   /**
    * 清空视图栈
    */
-  static clear({
+  static clear ({
     stack
   }: {
     /**
@@ -234,7 +244,7 @@ class ViewModule {
   /**
    * 获取指定视图栈的长度
    */
-  static getSize({
+  static getSize ({
     stack
   }: {
     /**
@@ -251,15 +261,12 @@ class ViewModule {
     return null
   }
 
-  private static _fallbackStack(
+  private static _fallbackStack (
     stack?: string
   ): string | undefined {
     if (stack === undefined) {
       if (this.currentVisibles.length > 0) {
         return this.currentVisibles[this.currentVisibles.length - 1]
-      }
-      if (Object.keys(this.stacks.value).length > 0) {
-        return Object.keys(this.stacks.value)[0]
       }
     }
     return stack

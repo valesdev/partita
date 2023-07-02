@@ -21,12 +21,11 @@ import PtTabbar from './components/PtTabbar.vue'
 import PtSplitHeadbar from './components/PtSplitHeadbar.vue'
 import PtSplitFootbar from './components/PtSplitFootbar.vue'
 import PtModal from './components/PtModal.vue'
-import PtSpinner from './components/PtSpinner.vue'
-import PtPtr from './components/PtPtr.vue'
+import PtPtrWrapper from './components/PtPtrWrapper.vue'
 
-interface PartitaSpinnerOptions {
+interface PartitaLoadingOptions {
   /**
-   * 转圈自定义组件
+   * 加载指示器自定义组件
    */
   component?: Component
 }
@@ -62,9 +61,9 @@ interface PartitaDialogOptions {
 
 interface MainModuleOptions {
   /**
-   * 转圈相关配置
+   * 加载指示器相关配置
    */
-  spinner?: PartitaSpinnerOptions
+  loading?: PartitaLoadingOptions
 
   /**
    * 下拉刷新相关配置
@@ -80,7 +79,7 @@ interface MainModuleOptions {
 class MainModule {
   private static _options: MainModuleOptions = {}
 
-  static install(app: App, options: MainModuleOptions) {
+  static install (app: App, options?: MainModuleOptions) {
     LogUtils.d('[pt] plugin install - pt')
 
     app.config.globalProperties.$pt = this
@@ -97,11 +96,12 @@ class MainModule {
     app.component('PtSplitHeadbar', PtSplitHeadbar)
     app.component('PtSplitFootbar', PtSplitFootbar)
     app.component('PtModal', PtModal)
-    app.component('PtSpinner', PtSpinner)
-    app.component('PtPtr', PtPtr)
+    app.component('PtPtrWrapper', PtPtrWrapper)
 
     // options
-    this._options = options
+    if (options !== undefined) {
+      this._options = options
+    }
 
     // bootstrap modules
     app.use(ViewModule)
@@ -111,7 +111,7 @@ class MainModule {
     app.use(DbbModule)
   }
 
-  static get options(): MainModuleOptions {
+  static get options (): MainModuleOptions {
     return this._options
   }
 }
@@ -120,7 +120,7 @@ export default MainModule
 
 export {
   type MainModuleOptions,
-  type PartitaSpinnerOptions,
+  type PartitaLoadingOptions as PartitaSpinnerOptions,
   type PartitaPtrOptions,
   type PartitaDialogOptions
 }

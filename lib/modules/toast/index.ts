@@ -1,4 +1,4 @@
-import { type App, type Ref, ref } from 'vue'
+import { type App, type Ref, type Component, ref, markRaw } from 'vue'
 
 import LogUtils from '@/utils/log'
 import RandomUtils from '@/utils/random'
@@ -14,7 +14,12 @@ type ToastItem = {
   /**
    * 吐司内容
    */
-  content: string
+  content: string | null
+
+  /**
+   * 吐司自定义组件
+   */
+  component?: Component
 
   /**
    * 吐司自动隐藏定时器
@@ -27,34 +32,39 @@ interface ToastShowOptions {
    * 自动隐藏时长
    */
   timeout?: number
+
+  /**
+   * 吐司自定义组件
+   */
+  component?: Component
 }
 
 class ToastModule {
   private static items: Ref<ToastItem[]> = ref([])
 
-  static install(app: App) {
+  static install (app: App): void {
     LogUtils.d('[pt] plugin install - toast')
 
     app.config.globalProperties.$toast = this
   }
 
-  static get currentItems() {
+  static get currentItems () {
     return this.items.value
   }
 
   /**
    * 显示吐司
    */
-  static show(
+  static show (
     /**
      * 吐司内容
      */
-    content: string,
+    content: string | null,
 
     /**
      * 吐司配置
      */
-    options: ToastShowOptions = { timeout: 2e3 }
+    options?: ToastShowOptions
   ): void {
     LogUtils.d('[pt-toast] show()', 'content:', content)
 
@@ -63,7 +73,8 @@ class ToastModule {
     const item: ToastItem = {
       key,
       content,
-      timer: setTimeout(() => this.hideByKey(key), options.timeout)
+      component: options?.component !== undefined ? markRaw(options.component) : undefined,
+      timer: setTimeout(() => this.hideByKey(key), options?.timeout ?? 2e3)
     }
 
     this.items.value.push(item)
@@ -72,7 +83,7 @@ class ToastModule {
   /**
    * 通过 Key 隐藏吐司
    */
-  static hideByKey(
+  static hideByKey (
     /**
      * 吐司 Key
      */
