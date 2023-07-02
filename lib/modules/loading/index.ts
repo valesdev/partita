@@ -1,50 +1,69 @@
-import { type App, type Ref, ref } from 'vue'
+import { type App, type Ref, type Component, ref, markRaw } from 'vue'
 
 import LogUtils from '@/utils/log'
 
 import PtLoadingHolder from './PtLoadingHolder.vue'
 
 type LoadingItem = {
+  /**
+   * 加载指示器内容
+   */
   content: string | null
+
+  /**
+   * 加载指示器自定义组件
+   */
+  component?: Component
+}
+
+interface LoadingShowOptions {
+  /**
+   * 加载指示器自定义组件
+   */
+  component?: Component
 }
 
 class LoadingModule {
   private static items: Ref<LoadingItem[]> = ref([])
 
-  static install(app: App) {
+  static install (app: App): void {
     LogUtils.d('[pt] plugin install - loading')
 
     app.config.globalProperties.$loading = this
   }
 
-  static get currentShown(): boolean {
+  static get currentItem (): LoadingItem | null {
     return this.items.value.length > 0
-  }
-
-  static get currentContent(): string | null {
-    return this.items.value.length > 0
-      ? this.items.value[this.items.value.length - 1].content
+      ? this.items.value[this.items.value.length - 1]
       : null
   }
 
   /**
    * 显示加载指示器
    */
-  static show(
+  static show (
     /**
      * 加载指示器内容
      */
-    content: string | null = null
+    content: string | null = null,
+
+    /**
+     * 加载指示器配置
+     */
+    options?: LoadingShowOptions
   ): void {
     LogUtils.d('[pt-loading] show()', 'content:', content)
 
-    this.items.value.push({ content })
+    this.items.value.push({
+      content,
+      component: options?.component !== undefined ? markRaw(options.component) : undefined
+    })
   }
 
   /**
    * 隐藏加载指示器
    */
-  static hide(
+  static hide (
     /**
      * 加载指示器内容
      */

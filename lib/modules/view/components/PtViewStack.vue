@@ -14,17 +14,16 @@
         v-for="view in items"
         :key="view.key"
         :is="view.vNode"
-        :id="view.key"
-      />
+        :view-key="view.key" />
     </slot>
   </TransitionGroup>
 </template>
 
 <script setup lang="ts">
-import { type ComponentPublicInstance, ref, provide, createVNode, getCurrentInstance } from 'vue'
+import { type ComponentPublicInstance, ref, provide, createVNode, getCurrentInstance, onBeforeUnmount } from 'vue'
 import RandomUtils from '@/utils/random'
 import { default as ViewModule, type ViewInstance, type ViewInstances, type StackItem, ViewCreateEvent, ViewDestroyEvent, ViewHideEvent, ViewShowEvent } from '@/modules/view'
-import { viewStackFn as injectionKeyForViewStackFn } from '../injectionKeys'
+import { injectionKeyForViewStackFn } from '../injectionKeys'
 
 const app = getCurrentInstance()
 
@@ -70,7 +69,7 @@ const push = ({
       const key = items.value[items.value.length - 1].key
 
       // 触发前视图 hide 事件
-      views.value[key].emitOnHide(new ViewHideEvent)
+      views.value[key]?.emitOnHide(new ViewHideEvent)
     }
 
     // 新视图入栈
@@ -78,10 +77,10 @@ const push = ({
 
     window.setTimeout(() => {
       // 触发新视图 create 事件
-      views.value[key].emitOnCreate(new ViewCreateEvent)
+      views.value[key]?.emitOnCreate(new ViewCreateEvent)
 
       // 触发新视图 show 事件
-      views.value[key].emitOnShow(new ViewShowEvent)
+      views.value[key]?.emitOnShow(new ViewShowEvent)
     }, 0)
   }
 }
@@ -102,7 +101,7 @@ const pop = ({
       const key = items.value[items.value.length - steps].key
 
       // 触发前视图 show 事件
-      views.value[key].emitOnShow(new ViewShowEvent)
+      views.value[key]?.emitOnShow(new ViewShowEvent)
     }
 
     for (
@@ -114,7 +113,7 @@ const pop = ({
       const key = items.value[i].key
 
       // 触发原视图 hide 事件
-      views.value[key].emitOnHide(new ViewHideEvent)
+      views.value[key]?.emitOnHide(new ViewHideEvent)
 
       // 触发原视图 destroy 事件
       const destroyEvent = new ViewDestroyEvent
@@ -126,7 +125,7 @@ const pop = ({
           runDefault()
         }, 0)
       }
-      views.value[key].emitOnDestroy(destroyEvent)
+      views.value[key]?.emitOnDestroy(destroyEvent)
     }
 
     if (isRunDefault) {
@@ -159,10 +158,10 @@ const replace = ({
 
         window.setTimeout(() => {
           // 触发新视图 create 事件
-          views.value[key].emitOnCreate(new ViewCreateEvent)
+          views.value[key]?.emitOnCreate(new ViewCreateEvent)
 
           // 触发新视图 show 事件
-          views.value[key].emitOnShow(new ViewShowEvent)
+          views.value[key]?.emitOnShow(new ViewShowEvent)
         }, 0)
       }
 
@@ -171,7 +170,7 @@ const replace = ({
         const key = items.value[items.value.length - 1].key
 
         // 触发原视图 hide 事件
-        views.value[key].emitOnHide(new ViewHideEvent)
+        views.value[key]?.emitOnHide(new ViewHideEvent)
 
         // 触发原视图 destroy 事件
         const destroyEvent = new ViewDestroyEvent
@@ -183,7 +182,7 @@ const replace = ({
             runDefault()
           }, 0)
         }
-        views.value[key].emitOnDestroy(destroyEvent)
+        views.value[key]?.emitOnDestroy(destroyEvent)
       }
 
       if (isRunDefault) {
@@ -347,6 +346,12 @@ ViewModule.registerStack(
     getSize
   }
 )
+
+onBeforeUnmount(() => {
+  ViewModule.unregisterStack(
+    props.name
+  )
+})
 </script>
 
 <style lang="scss">

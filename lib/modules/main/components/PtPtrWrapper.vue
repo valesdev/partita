@@ -1,5 +1,5 @@
 <template>
-  <div class="PtPtr" :style="style">
+  <div class="PtPtrWrapper" :style="style">
     <template v-if="component !== undefined">
       <component :is="component" :state="state">
         <slot />
@@ -7,7 +7,7 @@
     </template>
 
     <template v-else>
-      <div class="PtPtr__wrap">
+      <div class="PtPtrWrapper__wrap">
         <slot />
       </div>
     </template>
@@ -42,7 +42,7 @@ const style = computed(() => {
 </script>
 
 <style lang="scss">
-.PtPtr {
+.PtPtrWrapper {
   &__wrap {}
 }
 </style>

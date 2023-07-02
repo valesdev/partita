@@ -9,7 +9,7 @@
 <script setup lang="ts">
 import { inject } from 'vue'
 
-import { viewStackFn as injectionKeyForViewStackFn } from '@/modules/view/injectionKeys'
+import { injectionKeyForViewStackFn } from '@/modules/view/injectionKeys'
 
 const viewStackFn = inject(injectionKeyForViewStackFn)
 

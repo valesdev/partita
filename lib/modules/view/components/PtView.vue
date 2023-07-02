@@ -6,11 +6,11 @@
 
 <script setup lang="ts">
 import { inject, onBeforeUnmount } from 'vue'
-import { viewStackFn as injectionKeyForViewStackFn } from '../injectionKeys'
+import { injectionKeyForViewStackFn } from '../injectionKeys'
 import { ViewCreateEvent, ViewDestroyEvent, ViewHideEvent, ViewShowEvent } from '@/modules/view'
 
 const props = defineProps<{
-  id: string,
+  viewKey: string,
 }>()
 
 const emit = defineEmits<{
@@ -20,7 +20,7 @@ const emit = defineEmits<{
   (e: 'destroy', event: ViewDestroyEvent): void
 }>()
 
-const stack = inject(injectionKeyForViewStackFn)
+const viewStackFn = inject(injectionKeyForViewStackFn)
 
 const emitOnCreate = (event: ViewCreateEvent) => {
   emit('create', event)
@@ -38,8 +38,8 @@ const emitOnHide = (event: ViewHideEvent) => {
   emit('hide', event)
 }
 
-stack?.registerView(
-  props.id,
+viewStackFn?.registerView(
+  props.viewKey,
   {
     emitOnCreate,
     emitOnDestroy,
@@ -49,8 +49,8 @@ stack?.registerView(
 )
 
 onBeforeUnmount(() => {
-  stack?.unregisterView(
-    props.id
+  viewStackFn?.unregisterView(
+    props.viewKey
   )
 })
 </script>

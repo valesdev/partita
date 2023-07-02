@@ -3,14 +3,19 @@
     tag="div"
     class="PtLoadingHolder"
   >
-    <div class="PtLoadingHolder__item" v-if="currentShown">
+    <div class="PtLoadingHolder__item" v-if="currentItem !== null">
       <div class="PtLoadingHolder__item-bg" />
       <div class="PtLoadingHolder__item-fg">
-        <template v-if="currentContent !== null">
-          <PtSpinner>{{ currentContent }}</PtSpinner>
+        <template v-if="currentItem.component !== undefined">
+          <component :is="currentItem.component">{{ currentItem.content }}</component>
         </template>
+
+        <template v-else-if="globalComponent !== undefined">
+          <component :is="globalComponent">{{ currentItem.content }}</component>
+        </template>
+
         <template v-else>
-          <PtSpinner />
+          <div class="PtLoadingHolder__item-content">{{ currentItem.content }}</div>
         </template>
       </div>
     </div>
@@ -18,16 +23,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { type Component, computed } from 'vue'
 
-import LoadingModule from '@/modules/loading'
+import MainModule from '@/modules/main'
+import LoadingModule, { type LoadingItem } from '@/modules/loading'
 
-const currentShown = computed<boolean>(() => {
-  return LoadingModule.currentShown
+const globalComponent = computed<Component | undefined>(() => {
+  return MainModule.options.loading?.component
 })
 
-const currentContent = computed<string | null>(() => {
-  return LoadingModule.currentContent
+const currentItem = computed<LoadingItem | null>(() => {
+  return LoadingModule.currentItem
 })
 </script>
 
@@ -55,5 +61,7 @@ const currentContent = computed<string | null>(() => {
     position: relative;
     z-index: 1;
   }
+
+  &__item-content {}
 }
 </style>

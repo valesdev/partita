@@ -7,7 +7,7 @@ import DialogModule from '@/modules/dialog'
 import ToastModule from '@/modules/toast'
 
 class DbbModule {
-  static install(app: App) {
+  static install (app: App): void {
     LogUtils.d('[pt] plugin install - dbb')
 
     app.config.globalProperties.$dbb = this
@@ -18,7 +18,7 @@ class DbbModule {
    *
    * @returns 是否执行成功
    */
-  static do(): boolean | null {
+  static do (): boolean | null {
     LogUtils.d('[pt-dbb] do')
 
     if (ToastModule.currentItems.length > 0) {

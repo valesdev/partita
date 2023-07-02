@@ -32,8 +32,7 @@
   &__center {
     flex: 0 0 auto;
     width: calc(180 / 360) * 100%;
-    display: flex;
-    justify-content: center;
+    text-align: center;
   }
 
   &__right {

@@ -3,36 +3,22 @@
     <div class="PtModal__bg" @click="hide" />
 
     <div class="PtModal__fg" :class="`PtModal__fg__position-${props.position !== undefined ? props.position : 'bottom'}`">
-      <PtViewContent :style="{ 'width': props.width, 'height': props.height }">
-        <slot />
-      </PtViewContent>
+      <slot />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import PtViewContent from './PtViewContent.vue'
-
 const props = defineProps<{
   /**
    * 弹窗是否可见
    */
-  visible: boolean,
+  visible: boolean
 
   /**
    * 弹窗位置
    */
-  position?: 'center' | 'top' | 'bottom' | 'left' | 'right',
-
-  /**
-   * 弹窗宽度
-   */
-  width?: string,
-
-  /**
-   * 弹窗高度
-   */
-  height?: string,
+  position?: 'center' | 'top' | 'bottom' | 'left' | 'right'
 }>()
 
 const emit = defineEmits<{
@@ -56,7 +42,7 @@ defineExpose({
 <style lang="scss">
 .PtModal {
   overflow: hidden;
-  position: absolute;
+  position: fixed;
   top: 0;
   right: 0;
   bottom: 0;
@@ -86,7 +72,6 @@ defineExpose({
 
   &__fg {
     max-height: 100%;
-    background-color: #ffffff;
     position: absolute;
     z-index: 1;
     visibility: hidden;

@@ -12,8 +12,8 @@
 
           <div class="PtDialogHolder__item-content" v-if="item.content !== null">{{ item.content }}</div>
 
-          <div class="PtDialogHolder__item-content" v-if="item.component !== undefined">
-            <component :is="item.component.is" v-bind="item.component.props" />
+          <div class="PtDialogHolder__item-content" v-if="item.extraComponent !== undefined">
+            <component :is="item.extraComponent.is" v-bind="item.extraComponent.props" />
           </div>
 
           <div class="PtDialogHolder__item-buttons" v-if="item.buttons !== undefined">
