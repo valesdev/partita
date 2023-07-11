@@ -1,11 +1,13 @@
 <template>
-  <div class="PtModal" :class="{ 'active': props.visible }">
-    <div class="PtModal__bg" @click="hide" />
+  <Teleport to="#app">
+    <div class="PtModal" :class="{ 'active': props.visible }">
+      <div class="PtModal__bg" @click="hide" />
 
-    <div class="PtModal__fg" :class="`PtModal__fg__position-${props.position !== undefined ? props.position : 'bottom'}`">
-      <slot />
+      <div class="PtModal__fg" :class="`PtModal__fg__position-${props.position !== undefined ? props.position : 'bottom'}`">
+        <slot />
+      </div>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
@@ -55,7 +57,7 @@ defineExpose({
   transition-property: visibility;
   transition-duration: 0.4s;
 
-  &__bg {
+  &>&__bg {
     background-color: rgba(0, 0, 0, 0.4);
     position: absolute;
     top: 0;
@@ -70,7 +72,7 @@ defineExpose({
     will-change: opacity;
   }
 
-  &__fg {
+  &>&__fg {
     max-height: 100%;
     position: absolute;
     z-index: 1;
@@ -118,12 +120,12 @@ defineExpose({
 
     &__position-right,
     &__position-left {
-      & > .PtViewContent {
+      &>.PtViewContent {
         height: 100%;
       }
     }
 
-    > .PtViewContent {
+    .PtViewContent {
       max-height: 100%;
     }
   }
@@ -131,12 +133,12 @@ defineExpose({
   &.active {
     visibility: visible;
 
-    .PtModal__bg {
+    >.PtModal__bg {
       visibility: visible;
       opacity: 1;
     }
 
-    .PtModal__fg {
+    >.PtModal__fg {
       visibility: visible;
       opacity: 1;
       transform: translate3d(0, 0, 0);

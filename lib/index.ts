@@ -16,7 +16,7 @@ export * from '@/modules/toast'
 export * from '@/modules/loading'
 export * from '@/modules/dbb'
 
-declare module 'vue' {
+declare module '@vue/runtime-core' {
   export interface ComponentCustomProperties {
     /**
      * Partita 主模块
