@@ -3,18 +3,27 @@
     ref="root"
     tag="div"
     class="PtViewStack"
+    :class="{
+      'is-animating': isAnimating
+    }"
     :css="false"
+    @touchstart.passive="_onTouchstart"
+    @touchmove.capture="_onTouchmove"
+    @touchend.passive="_onTouchend"
     @before-enter="_onTransitionBeforeEnter"
     @enter="_onTransitionEnter"
     @before-leave="_onTransitionBeforeLeave"
-    @leave="_onTransitionLeave"
-  >
+    @leave="_onTransitionLeave">
     <slot>
       <component
         v-for="view in items"
         :key="view.key"
         :is="view.vNode"
-        :view-key="view.key" />
+        :id="`PtViewStack-item-${view.key}`"
+        @pt-view-create="onViewCreate"
+        @pt-view-destroy="onViewDestroy"
+        @pt-view-show="onViewShow"
+        @pt-view-hide="onViewHide" />
     </slot>
   </TransitionGroup>
 </template>
@@ -22,7 +31,7 @@
 <script setup lang="ts">
 import { type ComponentPublicInstance, ref, provide, createVNode, getCurrentInstance, onBeforeUnmount } from 'vue'
 import RandomUtils from '@/utils/random'
-import { default as ViewModule, type ViewInstance, type ViewInstances, type StackItem, ViewCreateEvent, ViewDestroyEvent, ViewHideEvent, ViewShowEvent } from '@/modules/view'
+import { default as ViewModule, type StackItem, ViewCreateEvent, ViewDestroyEvent, ViewShowEvent, ViewHideEvent } from '@/modules/view'
 import { injectionKeyForViewStackFn } from '../injectionKeys'
 
 const app = getCurrentInstance()
@@ -36,22 +45,34 @@ const props = defineProps<{
   name: string,
 }>()
 
+const emit = defineEmits<{
+  (e: 'view-create', event: ViewCreateEvent): void
+  (e: 'view-destroy', event: ViewDestroyEvent): void
+  (e: 'view-show', event: ViewShowEvent): void
+  (e: 'view-hide', event: ViewHideEvent): void
+}>()
+
 const items = ref<StackItem[]>([])
 
-const views = ref<ViewInstances>({})
+const isAnimating = ref<boolean>(false)
 
-const registerView = (
-  key: string,
-  instance: ViewInstance
-) => {
-  views.value[key] = instance
+const onViewCreate = (event: ViewCreateEvent) => {
+  emit('view-create', event)
 }
 
-const unregisterView = (
-  key: string
-) => {
-  delete views.value[key]
+const onViewDestroy = (event: ViewDestroyEvent) => {
+  emit('view-destroy', event)
 }
+
+const onViewShow = (event: ViewShowEvent) => {
+  emit('view-show', event)
+}
+
+const onViewHide = (event: ViewHideEvent) => {
+  emit('view-hide', event)
+}
+
+// 逻辑部分
 
 const push = ({
   name,
@@ -66,21 +87,27 @@ const push = ({
   if (view !== null) {
     if (items.value.length > 0) {
       // 前视图 Key
-      const key = items.value[items.value.length - 1].key
+      const lastKey = items.value[items.value.length - 1].key
+
+      // 前视图 DOM
+      const lastEl = window.document.getElementById(`PtViewStack-item-${lastKey}`)
 
       // 触发前视图 hide 事件
-      views.value[key]?.emitOnHide(new ViewHideEvent)
+      lastEl?.dispatchEvent(new ViewHideEvent)
     }
 
     // 新视图入栈
     items.value.push(view)
 
     window.setTimeout(() => {
+      // 新视图 DOM
+      const el = window.document.getElementById(`PtViewStack-item-${key}`)
+
       // 触发新视图 create 事件
-      views.value[key]?.emitOnCreate(new ViewCreateEvent)
+      el?.dispatchEvent(new ViewCreateEvent)
 
       // 触发新视图 show 事件
-      views.value[key]?.emitOnShow(new ViewShowEvent)
+      el?.dispatchEvent(new ViewShowEvent)
     }, 0)
   }
 }
@@ -98,10 +125,13 @@ const pop = ({
       items.value.splice(items.value.length - steps)
 
       // 前视图 Key
-      const key = items.value[items.value.length - steps].key
+      const lastKey = items.value[items.value.length - steps].key
+
+      // 前视图 DOM
+      const lastEl = window.document.getElementById(`PtViewStack-item-${lastKey}`)
 
       // 触发前视图 show 事件
-      views.value[key]?.emitOnShow(new ViewShowEvent)
+      lastEl?.dispatchEvent(new ViewShowEvent)
     }
 
     for (
@@ -112,8 +142,11 @@ const pop = ({
       // 原视图 Key
       const key = items.value[i].key
 
+      // 原视图 DOM
+      const el = window.document.getElementById(`PtViewStack-item-${key}`)
+
       // 触发原视图 hide 事件
-      views.value[key]?.emitOnHide(new ViewHideEvent)
+      el?.dispatchEvent(new ViewHideEvent)
 
       // 触发原视图 destroy 事件
       const destroyEvent = new ViewDestroyEvent
@@ -125,7 +158,7 @@ const pop = ({
           runDefault()
         }, 0)
       }
-      views.value[key]?.emitOnDestroy(destroyEvent)
+      el?.dispatchEvent(destroyEvent)
     }
 
     if (isRunDefault) {
@@ -157,11 +190,14 @@ const replace = ({
         )
 
         window.setTimeout(() => {
+          // 新视图 DOM
+          const el = window.document.getElementById(`PtViewStack-item-${key}`)
+
           // 触发新视图 create 事件
-          views.value[key]?.emitOnCreate(new ViewCreateEvent)
+          el?.dispatchEvent(new ViewCreateEvent)
 
           // 触发新视图 show 事件
-          views.value[key]?.emitOnShow(new ViewShowEvent)
+          el?.dispatchEvent(new ViewShowEvent)
         }, 0)
       }
 
@@ -169,8 +205,11 @@ const replace = ({
         // 原视图 Key
         const key = items.value[items.value.length - 1].key
 
+        // 原视图 DOM
+        const el = window.document.getElementById(`PtViewStack-item-${key}`)
+
         // 触发原视图 hide 事件
-        views.value[key]?.emitOnHide(new ViewHideEvent)
+        el?.dispatchEvent(new ViewHideEvent)
 
         // 触发原视图 destroy 事件
         const destroyEvent = new ViewDestroyEvent
@@ -182,7 +221,7 @@ const replace = ({
             runDefault()
           }, 0)
         }
-        views.value[key]?.emitOnDestroy(destroyEvent)
+        el?.dispatchEvent(destroyEvent)
       }
 
       if (isRunDefault) {
@@ -223,7 +262,7 @@ const _generateView = (
 
 // 动画部分
 
-const _isLeaving = ref(false)
+let isLeaving: boolean = false
 
 const _getViewCount = () => {
   if (root.value === null) return 0
@@ -248,7 +287,7 @@ const _getLastSecondView = () => {
 }
 
 const _onTransitionBeforeEnter = (el: Element) => {
-  if (_getViewCount() > 0 && !_isLeaving.value) {
+  if (_getViewCount() > 0 && !isLeaving) {
     _animateElementBegin(el, 100)
 
     const lastView = _getLastView()
@@ -259,9 +298,14 @@ const _onTransitionBeforeEnter = (el: Element) => {
 }
 
 const _onTransitionEnter = (el: Element, done: () => void) => {
-  if (_getViewCount() > 1 && !_isLeaving.value) {
+  if (_getViewCount() > 1 && !isLeaving) {
+    isAnimating.value = true
+
     setTimeout(() => {
-      _animateElementRun(el, 0, done)
+      _animateElementRun(el, 0, () => {
+        isAnimating.value = false
+        done()
+      })
     }, 0)
 
     const lastSecondView = _getLastSecondView()
@@ -279,14 +323,18 @@ const _onTransitionBeforeLeave = (el: Element) => {
     _animateElementBegin(lastSecondView, -50)
   }
 
-  _isLeaving.value = true
+  isLeaving = true
   setTimeout(() => {
-    _isLeaving.value = false
+    isLeaving = false
   }, 400)
 }
 
 const _onTransitionLeave = (el: Element, done: () => void) => {
-  _animateElementRun(el, 100, done)
+  isAnimating.value = true
+  _animateElementRun(el, 100, () => {
+    isAnimating.value = false
+    done()
+  })
 
   if (_getViewCount() > 1) {
     const lastSecondView = _getLastSecondView()
@@ -305,7 +353,7 @@ const _animateElementBegin = (
   el.style.transitionDuration = '400ms'
   el.style.transitionTimingFunction = 'cubic-bezier(0.3, 0.4, 0, 0.9)'
   el.style.transform = `translateX(${percent}%)`
-  el.classList.add('PtView__animating')
+  el.classList.add('is-animating')
 }
 
 const _animateElementRun = (
@@ -318,7 +366,7 @@ const _animateElementRun = (
     el.style.transitionProperty = ''
     el.style.transitionDuration = ''
     el.style.transitionTimingFunction = ''
-    el.classList.remove('PtView__animating')
+    el.classList.remove('is-animating')
     if (complete !== null) {
       complete()
     }
@@ -326,9 +374,149 @@ const _animateElementRun = (
   el.style.transform = `translateX(${percent}%)`
 }
 
+// 触控部分
+
+let isSwipeInit: boolean = false
+let isSwiping: boolean = false
+let swipeStartAt: number = 0
+let swipeStartX: number = 0
+let swipeStartY: number = 0
+let swipeLastX: number = 0
+let swipeLastY: number = 0
+
+const _onTouchstart = (event: TouchEvent) => {
+  if (event.touches.length !== 1) return
+
+  const touch = event.touches[0]
+
+  if (touch.clientX > 30) return
+
+  isSwipeInit = true
+  swipeStartAt = event.timeStamp
+  swipeStartX = touch.clientX
+  swipeStartY = touch.clientY
+}
+
+const _onTouchmove = (event: TouchEvent) => {
+  if (!isSwipeInit) return
+
+  if (event.touches.length !== 1) return
+
+  const touch = event.touches[0]
+
+  swipeLastX = touch.clientX
+  swipeLastY = touch.clientY
+
+  const deltaX = swipeLastX - swipeStartX
+  const deltaY = swipeLastY - swipeStartY
+
+  if (!isSwiping) {
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      isSwiping = true
+    } else {
+      isSwiping = false
+      isSwipeInit = false
+    }
+  }
+
+  if (!isSwiping) return
+
+  event.stopPropagation()
+  event.preventDefault()
+
+  if (_getViewCount() > 1) {
+    const lastView = _getLastView()
+    if (lastView !== null) {
+      _translateElementSwiping(lastView, `${Math.max(0, deltaX)}px`)
+    }
+
+    const lastSecondView = _getLastSecondView()
+    if (lastSecondView !== null) {
+      _translateElementSwiping(lastSecondView, `calc(-50% + ${Math.max(0, deltaX / 2)}px)`)
+    }
+  }
+}
+
+const _onTouchend = (event: TouchEvent) => {
+  if (!isSwiping) return
+
+  isSwipeInit = false
+  isSwiping = false
+
+  const deltaX = swipeLastX - swipeStartX
+  const viewportWidth = (event.currentTarget as HTMLElement).offsetWidth
+  const velocityX = deltaX / (event.timeStamp - swipeStartAt)
+
+  if (velocityX > 0.2 || deltaX > viewportWidth / 2) {
+    if (_getViewCount() > 1) {
+      const lastView = _getLastView()
+      if (lastView !== null) {
+        _translateElementFinish(lastView)
+      }
+
+      const lastSecondView = _getLastSecondView()
+      if (lastSecondView !== null) {
+        _translateElementFinish(lastSecondView)
+      }
+    }
+
+    pop()
+  } else {
+    if (_getViewCount() > 1) {
+      const lastView = _getLastView()
+      if (lastView !== null) {
+        _translateElementRestore(lastView, '0px')
+      }
+
+      const lastSecondView = _getLastSecondView()
+      if (lastSecondView !== null) {
+        _translateElementRestore(lastSecondView, '-50%')
+      }
+    }
+  }
+}
+
+const _translateElementSwiping = (
+  element: Element,
+  value: string
+) => {
+  const el = element as HTMLElement
+  el.style.transform = `translateX(${value})`
+  el.classList.add('is-animating')
+  isAnimating.value = true
+}
+
+const _translateElementFinish = (
+  element: Element
+) => {
+  const el = element as HTMLElement
+  el.classList.remove('is-animating')
+  isAnimating.value = false
+}
+
+const _translateElementRestore = (
+  element: Element,
+  value: string
+) => {
+  const el = element as HTMLElement
+  el.addEventListener('transitionend', function () {
+    el.style.transitionProperty = ''
+    el.style.transitionDuration = ''
+    el.style.transitionTimingFunction = ''
+    el.classList.remove('is-animating')
+    isAnimating.value = false
+  }, { passive: true, once: true })
+  el.style.transitionProperty = 'transform'
+  el.style.transitionDuration = '400ms'
+  el.style.transitionTimingFunction = 'cubic-bezier(0.3, 0.4, 0, 0.9)'
+  el.style.transform = `translateX(${value})`
+  el.classList.add('is-animating')
+  isAnimating.value = true
+}
+
+// 其他
+
 provide(injectionKeyForViewStackFn, {
-  registerView,
-  unregisterView,
   push,
   pop,
   replace,
@@ -362,8 +550,14 @@ onBeforeUnmount(() => {
   position: relative;
   z-index: 1;
 
-  .PtView__animating {
+  &.is-animating {
     pointer-events: none;
+  }
+
+  .PtView {
+    &.is-animating {
+      box-shadow: 0 0 30px rgb(0, 0, 0, 0.2);
+    }
   }
 }
 </style>

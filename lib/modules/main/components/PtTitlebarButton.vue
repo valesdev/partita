@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 const emit = defineEmits<{
-  (e: 'click', event: MouseEvent): void,
+  (e: 'click', event: MouseEvent): void
 }>()
 
 const onClick = (event: MouseEvent) => {

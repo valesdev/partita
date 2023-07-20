@@ -14,7 +14,7 @@ import { injectionKeyForViewStackFn } from '@/modules/view/injectionKeys'
 const viewStackFn = inject(injectionKeyForViewStackFn)
 
 const emit = defineEmits<{
-  (e: 'click', event: MouseEvent): void,
+  (e: 'click', event: MouseEvent): void
 }>()
 
 const onClick = (event: MouseEvent) => {
