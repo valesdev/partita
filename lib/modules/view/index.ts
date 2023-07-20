@@ -22,26 +22,15 @@ interface StackItem {
   vNode: VNode
 }
 
-interface ViewInstances {
-  [key: string]: ViewInstance
-}
-
-interface ViewInstance {
-  emitOnCreate: (event: ViewCreateEvent) => void
-  emitOnDestroy: (event: ViewDestroyEvent) => void
-  emitOnShow: (event: ViewShowEvent) => void
-  emitOnHide: (event: ViewHideEvent) => void
-}
-
 class ViewCreateEvent extends CustomEvent<void> {
   constructor() {
-    super('create')
+    super('pt-view-create')
   }
 }
 
 class ViewDestroyEvent extends CustomEvent<void> {
   constructor() {
-    super('destroy')
+    super('pt-view-destroy')
   }
 
   runDefault (): void { }
@@ -49,13 +38,13 @@ class ViewDestroyEvent extends CustomEvent<void> {
 
 class ViewShowEvent extends CustomEvent<void> {
   constructor() {
-    super('show')
+    super('pt-view-show')
   }
 }
 
 class ViewHideEvent extends CustomEvent<void> {
   constructor() {
-    super('hide')
+    super('pt-view-hide')
   }
 }
 
@@ -279,8 +268,6 @@ export {
   type StackInstances,
   type StackInstance,
   type StackItem,
-  type ViewInstances,
-  type ViewInstance,
   ViewCreateEvent,
   ViewDestroyEvent,
   ViewHideEvent,

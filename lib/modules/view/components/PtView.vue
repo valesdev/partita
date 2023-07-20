@@ -1,58 +1,43 @@
 <template>
-  <div class="PtView">
+  <div
+    ref="root"
+    class="PtView"
+    @pt-view-create="onCreate"
+    @pt-view-destroy="onDestroy"
+    @pt-view-show="onShow"
+    @pt-view-hide="onHide">
     <slot />
   </div>
 </template>
 
 <script setup lang="ts">
-import { inject, onBeforeUnmount } from 'vue'
-import { injectionKeyForViewStackFn } from '../injectionKeys'
-import { ViewCreateEvent, ViewDestroyEvent, ViewHideEvent, ViewShowEvent } from '@/modules/view'
-
-const props = defineProps<{
-  viewKey: string,
-}>()
+import { ref } from 'vue'
+import { ViewCreateEvent, ViewDestroyEvent, ViewShowEvent, ViewHideEvent } from '@/modules/view'
 
 const emit = defineEmits<{
-  (e: 'show', event: ViewShowEvent): void,
-  (e: 'hide', event: ViewHideEvent): void,
-  (e: 'create', event: ViewCreateEvent): void,
+  (e: 'create', event: ViewCreateEvent): void
   (e: 'destroy', event: ViewDestroyEvent): void
+  (e: 'show', event: ViewShowEvent): void
+  (e: 'hide', event: ViewHideEvent): void
 }>()
 
-const viewStackFn = inject(injectionKeyForViewStackFn)
+const root = ref<HTMLElement | null>(null)
 
-const emitOnCreate = (event: ViewCreateEvent) => {
+const onCreate = (event: ViewCreateEvent) => {
   emit('create', event)
 }
 
-const emitOnDestroy = (event: ViewDestroyEvent) => {
+const onDestroy = (event: ViewDestroyEvent) => {
   emit('destroy', event)
 }
 
-const emitOnShow = (event: ViewShowEvent) => {
+const onShow = (event: ViewShowEvent) => {
   emit('show', event)
 }
 
-const emitOnHide = (event: ViewHideEvent) => {
+const onHide = (event: ViewHideEvent) => {
   emit('hide', event)
 }
-
-viewStackFn?.registerView(
-  props.viewKey,
-  {
-    emitOnCreate,
-    emitOnDestroy,
-    emitOnShow,
-    emitOnHide
-  }
-)
-
-onBeforeUnmount(() => {
-  viewStackFn?.unregisterView(
-    props.viewKey
-  )
-})
 </script>
 
 <style lang="scss">
