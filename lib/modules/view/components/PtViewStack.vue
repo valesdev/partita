@@ -18,7 +18,8 @@
       <component
         v-for="view in items"
         :key="view.key"
-        :is="view.vNode"
+        :is="view.component"
+        v-bind="view.bind"
         :id="`PtViewStack-item-${view.key}`"
         @pt-view-create="onViewCreate"
         @pt-view-destroy="onViewDestroy"
@@ -29,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { type ComponentPublicInstance, ref, provide, createVNode, getCurrentInstance, onBeforeUnmount } from 'vue'
+import { type ComponentPublicInstance, ref, provide, getCurrentInstance, onBeforeUnmount, markRaw } from 'vue'
 import RandomUtils from '@/utils/random'
 import { default as ViewModule, type StackItem, ViewCreateEvent, ViewDestroyEvent, ViewShowEvent, ViewHideEvent } from '@/modules/view'
 import { injectionKeyForViewStackFn } from '../injectionKeys'
@@ -43,6 +44,13 @@ const props = defineProps<{
    * 视图栈名称
    */
   name: string,
+
+  /**
+   * 异常回调
+   *
+   * @param error 异常
+   */
+  onError?: (error: Error) => void,
 }>()
 
 const emit = defineEmits<{
@@ -74,15 +82,15 @@ const onViewHide = (event: ViewHideEvent) => {
 
 // 逻辑部分
 
-const push = ({
+const push = async ({
   name,
   params
 }: {
   name: string
   params?: Record<string, unknown> | null
-}): void => {
+}): Promise<void> => {
   const key = RandomUtils.string(6)
-  const view = _generateView(key, name, params)
+  const view = await _generateView(key, name, params)
 
   if (view !== null) {
     if (items.value.length > 0) {
@@ -167,15 +175,15 @@ const pop = ({
   }
 }
 
-const replace = ({
+const replace = async ({
   name,
   params
 }: {
   name: string
   params?: Record<string, unknown> | null
-}): void => {
+}): Promise<void> => {
   const key = RandomUtils.string(6)
-  const view = _generateView(key, name, params)
+  const view = await _generateView(key, name, params)
 
   if (view !== null) {
     if (items.value.length > 0) {
@@ -239,25 +247,48 @@ const getSize = (): number | null => {
   return items.value.length
 }
 
-const _generateView = (
+const _generateView = async (
   key: string,
   name: string,
-  props?: Record<string, unknown> | null
-): StackItem | null => {
+  bind?: Record<string, unknown> | null
+): Promise<StackItem | null> => {
   if (app !== null) {
-    const component = app.appContext.app.component(`View${name}`)
+    return Promise.resolve()
+      .then(() => {
+        const component = app.appContext.app.component(`View${name}`)
 
-    if (component === undefined) {
-      throw new Error('Invalid view component name.')
-    }
+        if (component === undefined) {
+          throw new Error('Invalid view component name.')
+        }
 
-    const vNode = createVNode(component, props)
-    vNode.appContext = app.appContext
+        /**
+         * @link https://github.com/vuejs/core/issues/7898
+         * @link https://github.com/vuejs/core/pull/7901
+         */
+        if ('__asyncLoader' in component) {
+          return component.__asyncLoader()
+        } else {
+          return component
+        }
+      })
+      .then(component => {
+        return {
+          key,
+          component: markRaw(component),
+          bind
+        }
+      })
+      .catch(error => {
+        if (props.onError !== undefined) {
+          props.onError(error)
+          return null
+        }
 
-    return { key, vNode }
+        throw error
+      })
   }
 
-  return null
+  return Promise.resolve(null)
 }
 
 // 动画部分

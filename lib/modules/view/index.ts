@@ -1,4 +1,4 @@
-import { type App, type Ref, type VNode, ref } from 'vue'
+import { type App, type Ref, type Component, ref } from 'vue'
 
 import LogUtils from '@/utils/log'
 
@@ -19,7 +19,8 @@ interface StackInstance {
 
 interface StackItem {
   key: string
-  vNode: VNode
+  component: Component
+  bind?: Record<string, unknown> | null
 }
 
 class ViewCreateEvent extends CustomEvent<void> {
