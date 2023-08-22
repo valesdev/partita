@@ -7,6 +7,8 @@
 
 <style lang="scss">
 .PtStatusbar {
+  flex: 0 0 auto;
+
   width: 100%;
   height: env(safe-area-inset-top);
 }
