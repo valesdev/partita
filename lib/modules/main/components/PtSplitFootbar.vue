@@ -16,7 +16,7 @@
 <style lang="scss">
 .PtSplitFootbar {
   flex: 1 1 auto;
-  height: 100%;
+  max-height: 100%;
   overflow: hidden;
   display: flex;
   flex-direction: column;
