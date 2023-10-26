@@ -469,6 +469,7 @@ const _onTouchmove = (event: TouchEvent) => {
 }
 
 const _onTouchend = (event: TouchEvent) => {
+  if (!isSwipeInit) return
   if (!isSwiping) return
 
   isSwipeInit = false
