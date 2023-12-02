@@ -39,7 +39,7 @@ class DbbModule {
     if (ViewModule.currentVisibles.length >= 2) {
       const lastStack = ViewModule.currentVisibles[ViewModule.currentVisibles.length - 1]
       const lastStackSize = ViewModule.getSize({ stack: lastStack })
-      if (lastStackSize !== null && lastStackSize > 0) {
+      if (lastStackSize !== null && lastStackSize >= 2) {
         ViewModule.pop({ stack: lastStack })
         return true
       } else {
