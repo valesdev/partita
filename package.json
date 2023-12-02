@@ -1,6 +1,6 @@
 {
   "name": "partita",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "A template framework for mobile web apps, proundly powered by Vue.js.",
   "type": "module",
   "files": [
